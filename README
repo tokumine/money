@@ -25,17 +25,17 @@ Alternatively you can get the library packed
 == Usage
 
 Use the compose_of helper to let active record deal with embedding the money
-object in your models. The following example requires a cents and a currency field.
+object in your models. The following example requires a pence and a currency field.
 
   class ProductUnit < ActiveRecord::Base
     belongs_to :product
-    composed_of :price, :class_name => "Money", :mapping => [%w(cents cents) %(currency currency)]
+    composed_of :price, :class_name => "Money", :mapping => [%w(pence pence) %(currency currency)]
 
     private        
-      validate :cents_not_zero
+      validate :pence_not_zero
     
-      def cents_not_zero
-        errors.add("cents", "cannot be zero or less") unless cents > 0
+      def pence_not_zero
+        errors.add("pence", "cannot be zero or less") unless pence > 0
       end
     
       validates_presence_of :sku, :currency

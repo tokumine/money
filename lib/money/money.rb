@@ -1,17 +1,17 @@
 # === Usage with ActiveRecord
 # 
 # Use the compose_of helper to let active record deal with embedding the money
-# object in your models. The following example requires a cents and a currency field.
+# object in your models. The following example requires a pence and a currency field.
 # 
 #   class ProductUnit < ActiveRecord::Base
 #     belongs_to :product
-#     composed_of :price, :class_name => "Money", :mapping => [ %w(cents cents), %w(currency currency) ]
+#     composed_of :price, :class_name => "Money", :mapping => [ %w(pence pence), %w(currency currency) ]
 # 
 #     private        
-#       validate :cents_not_zero
+#       validate :pence_not_zero
 #     
-#       def cents_not_zero
-#         errors.add("cents", "cannot be zero or less") unless cents > 0
+#       def pence_not_zero
+#         errors.add("pence", "cannot be zero or less") unless pence > 0
 #       end
 #     
 #       validates_presence_of :sku, :currency
@@ -21,7 +21,7 @@
 class Money
   include Comparable
 
-  attr_reader :cents, :currency
+  attr_reader :pence, :currency
 
   class MoneyError < StandardError# :nodoc:
   end
@@ -40,7 +40,7 @@ class Money
   @@bank = NoExchangeBank.new
   cattr_accessor :bank
 
-  @@default_currency = "USD"
+  @@default_currency = "GBP"
   cattr_accessor :default_currency
 
   # Creates a new money object. 
@@ -48,73 +48,73 @@ class Money
   # 
   # Alternativly you can use the convinience methods like 
   # Money.ca_dollar and Money.us_dollar 
-  def initialize(cents, currency = default_currency)
-    @cents, @currency = cents.round, currency
+  def initialize(pence, currency = default_currency)
+    @pence, @currency = pence.round, currency
   end
 
   # Do two money objects equal? Only works if both objects are of the same currency
   def eql?(other_money)
-    cents == other_money.cents && currency == other_money.currency
+    pence == other_money.pence && currency == other_money.currency
   end
 
   def <=>(other_money)
     if currency == other_money.currency
-      cents <=> other_money.cents
+      pence <=> other_money.pence
     else
-      cents <=> other_money.exchange_to(currency).cents
+      pence <=> other_money.exchange_to(currency).pence
     end
   end
 
   def +(other_money)
-    return other_money.dup if cents.zero? 
-    return dup if other_money.cents.zero?
+    return other_money.dup if pence.zero? 
+    return dup if other_money.pence.zero?
 
     if currency == other_money.currency
-      Money.new(cents + other_money.cents, other_money.currency)
+      Money.new(pence + other_money.pence, other_money.currency)
     else
-      Money.new(cents + other_money.exchange_to(currency).cents,currency)
+      Money.new(pence + other_money.exchange_to(currency).pence,currency)
     end   
   end
 
   def -(other_money)
 
     if currency == other_money.currency
-      Money.new(cents - other_money.cents, other_money.currency)
+      Money.new(pence - other_money.pence, other_money.currency)
     else
       
-      return other_money.dup if self.cents.zero?
+      return other_money.dup if self.pence.zero?
 
-      return self.dup if other_money.cents.zero?
+      return self.dup if other_money.pence.zero?
       
       
-      Money.new(cents - other_money.exchange_to(currency).cents, currency)
+      Money.new(pence - other_money.exchange_to(currency).pence, currency)
       
     end   
   end
 
-  # get the cents value of the object
-  def cents
-    @cents.to_i
+  # get the pence value of the object
+  def pence
+    @pence.to_i
   end
 
   # multiply money by fixnum
   def *(fixnum)
-    Money.new(cents * fixnum, currency)    
+    Money.new(pence * fixnum, currency)    
   end
 
   # divide money by fixnum
   def /(fixnum)
-    Money.new(cents / fixnum, currency)    
+    Money.new(pence / fixnum, currency)    
   end
   
   # Test if the money amount is zero
   def zero?
-    cents == 0 
+    pence == 0 
   end
 
 
   # Format the price according to several rules
-  # Currently supported are :with_currency, :no_cents and :html
+  # Currently supported are :with_currency, :no_pence and :html
   #
   # with_currency: 
   #
@@ -123,26 +123,26 @@ class Money
   #  Money.ca_dollar(100).format(:with_currency) => "$1.00 CAD"
   #  Money.us_dollar(85).format(:with_currency) => "$0.85 USD"
   #
-  # no_cents:  
+  # no_pence:  
   #
-  #  Money.ca_dollar(100).format(:no_cents) => "$1"
-  #  Money.ca_dollar(599).format(:no_cents) => "$5"
+  #  Money.ca_dollar(100).format(:no_pence) => "$1"
+  #  Money.ca_dollar(599).format(:no_pence) => "$5"
   #  
-  #  Money.ca_dollar(570).format(:no_cents, :with_currency) => "$5 CAD"
-  #  Money.ca_dollar(39000).format(:no_cents) => "$390"
+  #  Money.ca_dollar(570).format(:no_pence, :with_currency) => "$5 CAD"
+  #  Money.ca_dollar(39000).format(:no_pence) => "$390"
   #
   # html:
   #
   #  Money.ca_dollar(570).format(:html, :with_currency) =>  "$5.70 <span class=\"currency\">CAD</span>"
   def format(*rules)
-    return "free" if cents == 0
+    return "free" if pence == 0
 
     rules = rules.flatten
 
-    if rules.include?(:no_cents)
-      formatted = sprintf("$%d", cents.to_f / 100  )          
+    if rules.include?(:no_pence)
+      formatted = sprintf("$%d", pence.to_f / 100  )          
     else
-      formatted = sprintf("$%.2f", cents.to_f / 100  )      
+      formatted = sprintf("$%.2f", pence.to_f / 100  )      
     end
 
     if rules.include?(:with_currency)
@@ -156,7 +156,7 @@ class Money
 
   # Money.ca_dollar(100).to_s => "1.00"
   def to_s
-    sprintf("%.2f", cents.to_f / 100  )
+    sprintf("%.2f", pence.to_f / 100  )
   end
 
   # Recieve the amount of this money object in another currency   
@@ -180,8 +180,13 @@ class Money
   end
 
   # Create a new money object using the Euro currency
-  def self.euro(num)
+  def self.eu_euro(num)
     Money.new(num, "EUR")
+  end
+
+  # Create a new money object using the British Pound
+  def self.gb_pound(num)
+    Money.new(num, "GBP")
   end
 
   # Recieve a money object with the same amount as the current Money object
@@ -198,9 +203,16 @@ class Money
 
   # Recieve a money object with the same amount as the current Money object
   # in euro
-  def as_ca_euro
+  def as_eu_euro
     exchange_to("EUR")
   end  
+
+  # Recieve a money object with the same amount as the current Money object
+  # in pound
+  def as_gb_pound
+    exchange_to("GBP")
+  end  
+
 
   # Conversation to self
   def to_money

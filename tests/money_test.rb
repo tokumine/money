@@ -99,12 +99,12 @@ class MoneyTest < Test::Unit::TestCase
     assert_equal "$1.00", @can1.format 
     assert_equal "$1.00 CAD", @can1.format(:with_currency)
 
-    assert_equal "$1", @can1.format(:no_cents)
-    assert_equal "$5", Money.ca_dollar(570).format(:no_cents)
+    assert_equal "$1", @can1.format(:no_pence)
+    assert_equal "$5", Money.ca_dollar(570).format(:no_pence)
 
-    assert_equal "$5 CAD", Money.ca_dollar(570).format([:no_cents, :with_currency])
-    assert_equal "$5 CAD", Money.ca_dollar(570).format(:no_cents, :with_currency)
-    assert_equal "$390", Money.ca_dollar(39000).format(:no_cents)
+    assert_equal "$5 CAD", Money.ca_dollar(570).format([:no_pence, :with_currency])
+    assert_equal "$5 CAD", Money.ca_dollar(570).format(:no_pence, :with_currency)
+    assert_equal "$390", Money.ca_dollar(39000).format(:no_pence)
 
     assert_equal "$5.70 <span class=\"currency\">CAD</span>", Money.ca_dollar(570).format([:html, :with_currency])
     
