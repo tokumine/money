@@ -74,6 +74,15 @@ class MoneyTest < Test::Unit::TestCase
     assert_equal Money.ca_dollar(100), Money.ca_dollar(5500) / 55    
     assert_equal Money.ca_dollar(100), Money.ca_dollar(200) / 2    
   end
+
+  def test_divide_by_float
+    assert_equal Money.ca_dollar(55000), Money.ca_dollar(55) / 0.001    
+    assert_equal Money.ca_dollar(275), Money.ca_dollar(55) / 0.2
+    # Round down (55 / 0.3 = 183.3333)
+    assert_equal Money.ca_dollar(183), Money.ca_dollar(55) / 0.3
+    # Round up (55 / 0.4 = 138.5)
+    assert_equal Money.ca_dollar(138), Money.ca_dollar(55) / 0.4
+  end
   
   def test_empty_can_exchange_currency
     assert_equal Money.ca_dollar(100), Money.empty('USD') + Money.ca_dollar(100)

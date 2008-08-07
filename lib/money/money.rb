@@ -140,9 +140,9 @@ class Money
     rules = rules.flatten
 
     if rules.include?(:no_pence)
-      formatted = sprintf("$%d", pence.to_f / 100  )          
+      formatted = sprintf("£%d", pence.to_f / 100  )          
     else
-      formatted = sprintf("$%.2f", pence.to_f / 100  )      
+      formatted = sprintf("£%.2f", pence.to_f / 100  )      
     end
 
     if rules.include?(:with_currency)
