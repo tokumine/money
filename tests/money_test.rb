@@ -14,7 +14,7 @@ class MoneyTest < Test::Unit::TestCase
     
     Money.bank = NoExchangeBank.new
     Money.default_currency = "USD"
-    
+    Money.default_currency_unit = "$"
   end
   
   def test_sanity
@@ -119,5 +119,10 @@ class MoneyTest < Test::Unit::TestCase
     
   end
   
+  def test_negative
+    assert_equal true, Money.new(-1).negative?
+    assert_equal false, Money.new(0).negative?
+    assert_equal false, Money.new(1).negative?
+  end
   
 end

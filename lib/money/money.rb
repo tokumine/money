@@ -21,7 +21,7 @@
 class Money
   include Comparable
 
-  attr_reader :pence, :currency
+  attr_reader :pence, :currency, :currency_unit
 
   class MoneyError < StandardError# :nodoc:
   end
@@ -41,15 +41,17 @@ class Money
   cattr_accessor :bank
 
   @@default_currency = "GBP"
+  @@default_currency_value = "£"
   cattr_accessor :default_currency
-
+  cattr_accessor :default_currency_unit
+  
   # Creates a new money object. 
   #  Money.new(100) 
   # 
   # Alternativly you can use the convinience methods like 
   # Money.ca_dollar and Money.us_dollar 
-  def initialize(pence, currency = default_currency)
-    @pence, @currency = pence.round, currency
+  def initialize(pence, currency = default_currency, currency_unit = default_currency_unit)
+    @pence, @currency, @currency_unit = pence.round, currency, currency_unit
   end
 
   # Do two money objects equal? Only works if both objects are of the same currency
@@ -140,9 +142,9 @@ class Money
     rules = rules.flatten
 
     if rules.include?(:no_pence)
-      formatted = sprintf("£%d", pence.to_f / 100  )          
+      formatted = sprintf("#{currency_unit}%d", pence.to_f / 100  )          
     else
-      formatted = sprintf("£%.2f", pence.to_f / 100  )      
+      formatted = sprintf("#{currency_unit}%.2f", pence.to_f / 100  )      
     end
 
     if rules.include?(:with_currency)
@@ -171,22 +173,22 @@ class Money
 
   # Create a new money object using the Canadian dollar currency
   def self.ca_dollar(num)
-    Money.new(num, "CAD")
+    Money.new(num, "CAD", "$")
   end
 
   # Create a new money object using the American dollar currency
   def self.us_dollar(num)
-    Money.new(num, "USD")
+    Money.new(num, "USD", "$")
   end
 
   # Create a new money object using the Euro currency
   def self.eu_euro(num)
-    Money.new(num, "EUR")
+    Money.new(num, "EUR", "£")
   end
 
   # Create a new money object using the British Pound
   def self.gb_pound(num)
-    Money.new(num, "GBP")
+    Money.new(num, "GBP", "£")
   end
 
   # Recieve a money object with the same amount as the current Money object
@@ -213,6 +215,10 @@ class Money
     exchange_to("GBP")
   end  
 
+  # Return true if @pence is negative
+  def negative?
+    pence < 0
+  end
 
   # Conversation to self
   def to_money
