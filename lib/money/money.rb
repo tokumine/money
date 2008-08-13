@@ -41,7 +41,7 @@ class Money
   cattr_accessor :bank
 
   @@default_currency = "GBP"
-  @@default_currency_value = "£"
+  @@default_currency_unit = "£"
   cattr_accessor :default_currency
   cattr_accessor :default_currency_unit
   
