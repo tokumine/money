@@ -104,7 +104,7 @@ class MoneyTest < Test::Unit::TestCase
   
   def test_formatting
 
-    assert_equal "free", Money.ca_dollar(0).format
+    assert_equal "$0.00", Money.ca_dollar(0).format
     assert_equal "$1.00", @can1.format 
     assert_equal "$1.00 CAD", @can1.format(:with_currency)
 
